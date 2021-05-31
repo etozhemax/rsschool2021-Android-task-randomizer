@@ -5,13 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 
 class FirstFragment : Fragment() {
 
     private var generateButton: Button? = null
     private var previousResult: TextView? = null
+
+    private var minEditText: EditText? = null
+    private var maxEditText: EditText? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,14 +33,33 @@ class FirstFragment : Fragment() {
         previousResult = view.findViewById(R.id.previous_result)
         generateButton = view.findViewById(R.id.generate)
 
+        generateButton?.isEnabled = false
+
         val result = arguments?.getInt(PREVIOUS_RESULT_KEY)
         previousResult?.text = "Previous result: ${result.toString()}"
 
-        // TODO: val min = ...
-        // TODO: val max = ...
+        minEditText = view.findViewById(R.id.min_value)
+        maxEditText = view.findViewById(R.id.max_value)
 
         generateButton?.setOnClickListener {
-            // TODO: send min and max to the SecondFragment
+            val min = minEditText?.text.toString().toInt()
+            val max = maxEditText?.text.toString().toInt()
+
+            if (min > max) {
+                Toast.makeText(activity, R.string.error, Toast.LENGTH_LONG).show()
+            } else if (min < 0 || max < 0) {
+                Toast.makeText(activity, R.string.negative_error, Toast.LENGTH_LONG).show()
+            } else {
+                    (activity as MainActivity).transferToSecondFragment(min, max)
+            }
+        }
+
+        minEditText?.doOnTextChanged { text, start, count, after ->
+            generateButton?.isEnabled = !text.isNullOrEmpty() && !maxEditText?.text.isNullOrEmpty()
+        }
+
+        maxEditText?.doOnTextChanged { text, start, count, after ->
+            generateButton?.isEnabled = !text.isNullOrEmpty() && !minEditText?.text.isNullOrEmpty()
         }
     }
 

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">randomizer</string>
+    <string name="error">Please, enter valid values.</string>
+    <string name="negative_error">Numbers cannot be negative.</string>
 </resources>
